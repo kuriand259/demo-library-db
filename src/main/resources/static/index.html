@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Library Book Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    input, button {
+      margin: 5px;
+      padding: 6px;
+    }
+
+    .book {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 10px;
+    }
+
+    .book-actions {
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Library Book Manager</h1>
+
+  <h3>Add New Book</h3>
+  <input id="title" placeholder="Title">
+  <input id="author" placeholder="Author">
+  <input id="genre" placeholder="Genre">
+  <input id="year" placeholder="Year" type="number">
+  <button onclick="addBook()">Add</button>
+
+  <h3>All Books</h3>
+  <button onclick="loadBooks()">Refresh</button>
+  <div id="bookList"></div>
+
+  <script>
+    const api = "http://localhost:8080/books";
+
+    async function loadBooks() {
+      const res = await fetch(api);
+      const books = await res.json();
+      const list = document.getElementById("bookList");
+      list.innerHTML = "";
+      books.forEach(book => {
+        const bookDiv = document.createElement("div");
+        bookDiv.className = "book";
+        bookDiv.innerHTML = `
+          <strong>${book.title}</strong> by ${book.author} <br>
+          Genre: ${book.genre} | Year: ${book.publishedYear}
+          <div class="book-actions">
+            <button onclick="showUpdateForm(${book.id}, '${book.title}', '${book.author}', '${book.genre}', ${book.publishedYear})">Update</button>
+            <button onclick="deleteBook(${book.id})">Delete</button>
+          </div>
+          <div id="update-${book.id}"></div>
+        `;
+        list.appendChild(bookDiv);
+      });
+    }
+
+    async function addBook() {
+      const book = {
+        title: document.getElementById("title").value,
+        author: document.getElementById("author").value,
+        genre: document.getElementById("genre").value,
+        publishedYear: parseInt(document.getElementById("year").value)
+      };
+
+      await fetch(api, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(book)
+      });
+
+      clearForm();
+      loadBooks();
+    }
+
+    function clearForm() {
+      document.getElementById("title").value = "";
+      document.getElementById("author").value = "";
+      document.getElementById("genre").value = "";
+      document.getElementById("year").value = "";
+    }
+
+    async function deleteBook(id) {
+      await fetch(`${api}/${id}`, { method: "DELETE" });
+      loadBooks();
+    }
+
+    function showUpdateForm(id, title, author, genre, year) {
+      const updateDiv = document.getElementById(`update-${id}`);
+      updateDiv.innerHTML = `
+        <input id="utitle-${id}" value="${title}">
+        <input id="uauthor-${id}" value="${author}">
+        <input id="ugenre-${id}" value="${genre}">
+        <input id="uyear-${id}" value="${year}" type="number">
+        <button onclick="updateBook(${id})">Save</button>
+        <button onclick="cancelUpdate(${id})">Cancel</button>
+      `;
+    }
+
+    function cancelUpdate(id) {
+      document.getElementById(`update-${id}`).innerHTML = "";
+    }
+
+    async function updateBook(id) {
+      const updated = {
+        title: document.getElementById(`utitle-${id}`).value,
+        author: document.getElementById(`uauthor-${id}`).value,
+        genre: document.getElementById(`ugenre-${id}`).value,
+        publishedYear: parseInt(document.getElementById(`uyear-${id}`).value)
+      };
+
+      await fetch(`${api}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updated)
+      });
+
+      loadBooks();
+    }
+
+    loadBooks(); // Load books on page load
+  </script>
+</body>
+</html>
