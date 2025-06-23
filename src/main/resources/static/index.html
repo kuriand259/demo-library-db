@@ -2,45 +2,33 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=danson:wght@400&display=swap" rel="stylesheet" />
   <title>Library Book Manager</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
+  <!-- <style>
 
-    input, button {
-      margin: 5px;
-      padding: 6px;
-    }
-
-    .book {
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-top: 10px;
-    }
-
-    .book-actions {
-      margin-top: 5px;
-    }
-  </style>
+  </style> -->
 </head>
 <body>
-  <h1>Library Book Manager</h1>
-
-  <h3>Add New Book</h3>
-  <input id="title" placeholder="Title">
-  <input id="author" placeholder="Author">
-  <input id="genre" placeholder="Genre">
-  <input id="year" placeholder="Year" type="number">
-  <button onclick="addBook()">Add</button>
-
-  <h3>All Books</h3>
-  <button onclick="loadBooks()">Refresh</button>
+  <div style="justify-items: center;">
+    <h1 style = "color: #023047;font-size: 5.5vw;margin: 1vw;padding: 0%;">Library Book Manager</h1>
+    <div class="add-form">
+      <p style="font-size: 3vw;margin-bottom: 10px;">Add New Book</p>
+      <div class="add-form-items">
+        <input id="title" placeholder="Title">
+        <input id="author" placeholder="Author">
+        <input id="genre" placeholder="Genre">
+        <input id="year" placeholder="Year" type="number">
+        <button onclick="addBook()">Add</button>
+      </div>
+    </div>
+  </div>
+    <p style="font-size: 3vw;display: inline-block;">All Books</p>
+    <button onclick="loadBooks()" style="margin : 1vw;">Refresh</button>
   <div id="bookList"></div>
 
   <script>
-    const api = "http://localhost:8080/books";
+    const api = "/books";
 
     async function loadBooks() {
       const res = await fetch(api);
@@ -61,6 +49,9 @@
         `;
         list.appendChild(bookDiv);
       });
+      const line = document.createElement("div");
+      line.className = "line";
+      document.body.appendChild(line);
     }
 
     async function addBook() {
