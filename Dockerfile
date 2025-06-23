@@ -1,14 +1,17 @@
-# Use a base JDK image
+# Use a JDK base image
 FROM eclipse-temurin:17-jdk
 
-# Set the working directory
+# Set working directory
 WORKDIR /app
 
-# Copy project files
+# Copy all files to container
 COPY . .
 
-# Build the project (using Maven Wrapper)
-RUN chmod +x mvnw && ./mvnw clean package -DskipTests
+# Make Maven wrapper executable
+RUN chmod +x mvnw
 
-# Run the app
-CMD ["java", "-jar", "target/*.jar"]
+# Build the application
+RUN ./mvnw clean package -DskipTests
+
+# Use `sh -c` so wildcard works for unknown JAR name
+CMD ["sh", "-c", "java -jar target/*.jar"]
